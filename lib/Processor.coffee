@@ -18,7 +18,8 @@ fs     = require 'fs'
 path   = require 'path'
 events = require 'events'
 
-utils = require './utils'
+utils   = require './utils'
+FileSet = require './FileSet'
 
 #-------------------------------------------------------------------------------
 module.exports = class Processor extends events.EventEmitter
@@ -32,34 +33,77 @@ module.exports = class Processor extends events.EventEmitter
         @oDirFull = path.resolve @oDir
         
         if !path.existsSync @iDirFull
-            @_emitErrorMessage "input directory '#{@iDir}' does not exist"
+            emitErrorMessage "input directory '#{@iDir}' does not exist"
             return
         
         if !path.existsSync @oDirFull
-            @_emitErrorMessage "output directory '#{@oDir}' does not exist"
+            emitErrorMessage "output directory '#{@oDir}' does not exist"
             return
         
         iStats = fs.statSync @iDirFull
         oStats = fs.statSync @oDirFull
         
         if !iStats.isDirectory()
-            @_emitErrorMessage "input directory '#{@iDir}' is not a directory"
+            emitErrorMessage "input directory '#{@iDir}' is not a directory"
             return
             
         if !oStats.isDirectory()
-            @_emitErrorMessage "output directory '#{@oDir}' is not a directory"
+            emitErrorMessage "output directory '#{@oDir}' is not a directory"
             return
 
         if @iDirFull == @oDirFull            
-            @_emitErrorMessage "the input and output directory cannot be the same"
+            emitErrorMessage "the input and output directory cannot be the same"
             return
         
-        console.log "iDir:    #{@iDir} #{@iDirFull}"
-        console.log "oDir:    #{@oDir} #{@oDirFull}"
-        console.log "options: #{JSON.stringify(@options)}"
+#        console.log "iDir:    #{@iDir} #{@iDirFull}"
+#        console.log "oDir:    #{@oDir} #{@oDirFull}"
+#        console.log "options: #{JSON.stringify(@options)}"
+#        console.log ""
+        
+#        iFileSet = FileSet.fromDir(@iDirFull)
+#        oFileSet = FileSet.fromDir(@oDirFull)
+        
+#        console.log "iDir files:"
+#        iFileSet.dump()
+#        console.log ""
+        
+#        console.log "oDir files:"
+#        oFileSet.dump()
 
+        emptyDir(@oDirFull)
+        copyFiles(@oDirFull, @iDirFull)
+        
         @emit 'done'
 
-    #---------------------------------------------------------------------------
-    _emitErrorMessage: (message) ->
-        @emit 'error', new Error(message)
+#-------------------------------------------------------------------------------
+copyFiles = (toDir, fromDir) ->
+    fileSet = FileSet.fromDir(fromDir)
+
+    for dir in fileSet.relDirs()
+        dir = path.join(toDir, dir)
+#        fs.mkdirSync(dir)
+        console.log "woulda mkdir'd  #{dir}"
+
+    for file in fileSet.relFiles()
+        copyFile(file, toDir)
+
+#-------------------------------------------------------------------------------
+copyFile = (file, toDir) ->
+    console.log "woulda copied #{file} to #{toDir}"
+
+#-------------------------------------------------------------------------------
+emptyDir = (dir) ->
+    fileSet = FileSet.fromDir(dir)
+    
+    for file in fileSet.fullFiles()
+#        fs.unlinkSync(file)
+        console.log "woulda unlink'd #{file}"
+
+    
+    for dir in fileSet.fullDirs().reverse()
+#        fs.rmdirSync(file)
+        console.log "woulda rmdir'd  #{dir}"
+
+#-------------------------------------------------------------------------------
+emitErrorMessage = (message) ->
+    @emit 'error', new Error(message)
