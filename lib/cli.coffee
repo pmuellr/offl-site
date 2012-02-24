@@ -14,14 +14,15 @@
 # limitations under the License.
 #-------------------------------------------------------------------------------
 
-fs        = require 'fs'
-path      = require 'path'
+fs         = require 'fs'
+path       = require 'path'
 
-nopt      = require 'nopt'
-uglify    = require 'uglify-js'
+nopt       = require 'nopt'
+uglify     = require 'uglify-js'
 
-utils     = require './utils'
-Processor = require './Processor'
+utils      = require './utils'
+Processor  = require './Processor'
+stackTrace = require './stackTrace'
 
 #-------------------------------------------------------------------------------
 class CLI
@@ -30,6 +31,7 @@ class CLI
     constructor: ->
         @argv = []
         @opts = {}
+
 
     #---------------------------------------------------------------------------
     run: ->
@@ -77,7 +79,7 @@ class CLI
         processor = new Processor(iDir, oDir, @opts)
         
         processor.addListener 'done', ->
-            utils.log 'CLI all done!'
+            process.exit()
 
         processor.addListener 'error', (e) ->
             utils.error e.message

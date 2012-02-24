@@ -17,6 +17,8 @@
 fs     = require 'fs'
 path   = require 'path'
 
+utils = require './utils'
+
 #-------------------------------------------------------------------------------
 module.exports = class FileTree
 
@@ -72,8 +74,12 @@ collectTree = (dir, prefix, files, dirs) ->
         fullName = path.join(dir, entry)
         relName  = path.join(prefix, entry)
         
-        stat = fs.statSync(fullName)
+        stat = fs.lstatSync(fullName)
         
+        if stat.isSymbolicLink()
+            utils.logVerbose "ignoring symlink: #{fullName}"
+            continue
+            
         files.push(relName) if stat.isFile()
         dirs.push(relName)  if stat.isDirectory()
         

@@ -17,6 +17,8 @@
 fs   = require 'fs'
 path = require 'path'
 
+stackTrace = require './stackTrace'
+
 #-------------------------------------------------------------------------------
 class Utils
 
@@ -26,8 +28,14 @@ class Utils
 
     #---------------------------------------------------------------------------
     error: (message) ->
-        @log message
-        process.exit 1
+        console.error "#{@PROGRAM}: #{message}"
+
+    #---------------------------------------------------------------------------
+    throwError: (message) ->
+        error = new Error(message)
+        error.stack = stackTrace.getCurrent()
+        
+        throw error
 
     #---------------------------------------------------------------------------
     exit: ->
@@ -38,7 +46,7 @@ class Utils
     
     #---------------------------------------------------------------------------
     logVerbose: (message) ->
-        log(message) if @verbose
+        @log(message) if @verbose
         
     #---------------------------------------------------------------------------
     log: (message) ->
