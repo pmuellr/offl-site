@@ -1,4 +1,3 @@
-<!-- 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller
 #
@@ -14,12 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #-------------------------------------------------------------------------------
--->
 
-<h1>simple-html sample</h1>
-
-<img src="off-site-128x128.png">
-
-<p>First page!
-
-<p>Go to the <a href="page-2.html">second page</a>
+#-------------------------------------------------------------------------------
+module.exports = class SiteAccessor

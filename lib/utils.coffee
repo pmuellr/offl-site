@@ -29,6 +29,7 @@ class Utils
     #---------------------------------------------------------------------------
     error: (message) ->
         console.error "#{@PROGRAM}: #{message}"
+        process.exit -1
 
     #---------------------------------------------------------------------------
     throwError: (message) ->
@@ -37,6 +38,14 @@ class Utils
         
         throw error
 
+    #---------------------------------------------------------------------------
+    readFile: (fileName) ->
+        return null if !path.existsSync(fileName)
+        
+        contents = fs.readFileSync(fileName, 'utf-8')
+        
+        return @trim(contents)
+    
     #---------------------------------------------------------------------------
     exit: ->
         process.exit
@@ -51,6 +60,10 @@ class Utils
     #---------------------------------------------------------------------------
     log: (message) ->
         console.log "#{@PROGRAM}: #{message}"
+    
+    #---------------------------------------------------------------------------
+    trim: (string) ->
+        string.replace /^\s+|\s+$/g, ''
     
 #-------------------------------------------------------------------------------
 utils = module.exports = new Utils

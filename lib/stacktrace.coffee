@@ -21,15 +21,20 @@
 
 MAX_STACK_FRAMES = 20
 
+utils = require './utils'
+
 #-------------------------------------------------------------------------------
 initV8stackGoop = () ->
 #    return if true
     Error.stackTraceLimit   ||= MAX_STACK_FRAMES
     Error.prepareStackTrace ||= prepareStackTrace
     
-    if process?
-        process.on 'uncaughtException', (err) -> 
-            console.error err.stack
+#    if process?
+#        process.on 'uncaughtException', (err) -> 
+#            if err.stack
+#                console.error err.stack
+#            else
+#                console.error "Exception caught: #{err}"
 
 #-------------------------------------------------------------------------------
 class StackTrace

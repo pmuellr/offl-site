@@ -1,6 +1,4 @@
-#!/usr/bin/env node
-
-/*
+<!-- 
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Patrick Mueller
 #
@@ -16,14 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #-------------------------------------------------------------------------------
-*/
+-->
 
-var path = require('path')
-var fs   = require('fs')
+simple-md sample
+================
 
-var packageDir = path.dirname(fs.realpathSync(__filename))
-var lib        = path.join(packageDir, 'lib')
+![logo](offl-site-128x128.png)
 
-require('coffee-script')
+First page!
 
-require(lib + '/offl-site').run()
+Go to the [second page](page-2.html)

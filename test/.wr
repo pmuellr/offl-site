@@ -9,20 +9,23 @@
 --stdoutcolor blue
 --stderrcolor red
 
+--exec
+
 #-----------------------------------------------------
 # command to run
 #-----------------------------------------------------
 
-make test
+make
 
 #-----------------------------------------------------
 # directories to watch
 #-----------------------------------------------------
 
 .wr
-images
-lib
-modules
-offl-site
-package.json
-sample
+../images
+../lib
+../package.json
+../sample-shells
+../sample-sites
+../modules
+../test

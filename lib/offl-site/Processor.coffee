@@ -20,8 +20,8 @@ events = require 'events'
 util   = require 'util'
 crypto = require 'crypto'
 
-utils   = require './utils'
-FileSet = require './FileSet'
+utils   = require '../utils'
+FileSet = require '../FileSet'
 
 #-------------------------------------------------------------------------------
 module.exports = class Processor extends events.EventEmitter
@@ -57,6 +57,8 @@ module.exports = class Processor extends events.EventEmitter
         if @iDirFull == @oDirFull            
             @emitErrorMessage "the input and output directory cannot be the same"
             return
+            
+        @checkForMain @iDirFull
         
 #        console.log "iDir:    #{@iDir} #{@iDirFull}"
 #        console.log "oDir:    #{@oDir} #{@oDirFull}"
@@ -75,24 +77,80 @@ module.exports = class Processor extends events.EventEmitter
 
         @emptyDir(@oDirFull)
         @copyFiles(@oDirFull, @iDirFull, @)
+
+        @writeManifest()
+        @writeHtAccess()
+        @writeGitIgnore()
+
+        utils.log "site created in: #{@oDir}"
         
-        manifest = path.join(@oDirFull, 'offl-site.manifest.txt')
+        @emit 'done'
+
+    #---------------------------------------------------------------------------
+    writeHtAccess: ->
+        htAccess = path.join(@oDirFull, '.htaccess')
+        return if path.existsSync(htAccess)
+
+        contents = """
+            # add header for CORS
+            Header set Access-Control-Allow-Origin *        
+        """
+
+        fs.writeFileSync htAccess, contents
+        utils.logVerbose "created: #{htAccess}"
+        
+    #---------------------------------------------------------------------------
+    writeGitIgnore: ->
+        gitIgnore = path.join(@oDirFull, '.gitignore')
+        return if path.existsSync(gitIgnore)
+
+        contents = """
+            # skip base64 encoded binaries
+            *.jpg.data
+            *.png.data
+            *.gif.data
+        """
+
+        fs.writeFileSync gitIgnore, contents
+        utils.logVerbose "created: #{gitIgnore}"
+        
+    #---------------------------------------------------------------------------
+    writeManifest: ->
+        manifest = path.join(@oDirFull, 'offl-site.manifest.json')
         contents = JSON.stringify(@records, null, 4)
         fs.writeFileSync manifest, contents
         
         manifest = path.join(@oDir, path.basename(manifest))
         utils.logVerbose "created: #{manifest}"
-        
-        @emit 'done'
+
 
     #---------------------------------------------------------------------------
-    addFileRecord: (file, relFile, stats, encoding, sha) ->
+    checkForMain: (dir) ->
+        exts = [
+            ".html"
+            ".ms.html"
+            ".md"
+            ".ms.md"
+        ]
+        
+        for ext in exts
+            fileName = "#{dir}/main#{ext}"
+            return if path.existsSync(fileName)
+            
+        @emitErrorMessage "a 'main' page was not found in the input directory"
+
+    #---------------------------------------------------------------------------
+    addFileRecord: (file, origFile, stats, encoding) ->
     
         record = 
-            path:     relFile
-            size:     stats.size
-            sha:      sha
-            encoding: encoding
+            path: file
+            size: stats.size
+            
+        if file != origFile
+            record.origPath = origFile
+            
+        if encoding
+            record.encoding = encoding
             
         @records.push record
         
@@ -119,8 +177,7 @@ module.exports = class Processor extends events.EventEmitter
         origRelFile = relFile
     
         contents = fs.readFileSync(fromFile)
-        sha      = crypto.createHash('sha1').update(contents).digest('hex')
-        encoding = 'utf-8'
+        encoding = null
         
         if @shouldUseBase64 toFile
             toFile   = "#{toFile}.data"
@@ -137,7 +194,8 @@ module.exports = class Processor extends events.EventEmitter
         
         utils.logVerbose "copied:  #{relFile}"
         
-        @addFileRecord toFile, origRelFile, fStats, encoding, sha
+        @addFileRecord relFile, origRelFile, fStats, encoding
+
     
     #---------------------------------------------------------------------------
     shouldUseBase64: (file) ->

@@ -26,4 +26,4 @@ var lib        = path.join(packageDir, 'lib')
 
 require('coffee-script')
 
-require(lib + '/offl-site').run()
+require(lib + '/offl-shell').run()

@@ -21,7 +21,7 @@ nopt       = require 'nopt'
 uglify     = require 'uglify-js'
 
 utils      = require './utils'
-Processor  = require './Processor'
+Processor  = require './offl-shell/Processor'
 stackTrace = require './stackTrace'
 
 #-------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ class CLI
             verbose: parsed.verbose
             version: parsed.version
             help:    parsed.help
-        
+            
         #console.log "argv: #{JSON.stringify(@argv)}"
         #console.log "opts: #{JSON.stringify(@opts)}"
         
@@ -90,7 +90,7 @@ class CLI
     help: ->
         console.log "#{utils.PROGRAM} [options] inDir outDir"
         console.log ''
-        console.log 'builds an offline-able site from inDir into outDir'
+        console.log 'builds a shell for an offl-site'
         console.log ''
         console.log 'options:'
         console.log '  -d --debug     generate debuggable output'

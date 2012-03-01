@@ -12,6 +12,7 @@ SYNOPSIS
 options:
 
     -d --debug     generate debuggable output
+    -s --shell     which shell to use
     -v --verbose   noisy
     -V --version   display version
     -h --help      display this help
